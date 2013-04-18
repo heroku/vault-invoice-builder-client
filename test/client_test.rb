@@ -59,4 +59,32 @@ class ClientTest < Vault::TestCase
       @client.render_html(@receipt)
     end
   end
+
+  # Client.store makes a POST request to the Vault::InvoiceBuilder HTTP API,
+  # passing the supplied credentials using HTTP Basic Auth, to which triggers
+  # Vault::InvoiceBuilder to generate the invoice and store it to S3.
+  def test_store
+    Excon.stub(method: :post) do |request|
+      assert_equal('vault-invoice-builder.herokuapp.com:443',
+                   request[:host_port])
+      assert_equal('/store', request[:path])
+      assert_equal('application/json', request[:headers]['Content-Type'])
+      Excon.stubs.pop
+      {status: 200}
+    end
+    response = @client.store(@receipt)
+    assert_equal(200, response.status)
+  end
+
+  # Client.store raises the appropriate Excon::Errors::HTTPStatusError if an
+  # unsuccessful HTTP status code is returned by the server.
+  def test_store_with_unsuccessful_response
+    Excon.stub(method: :post) do |request|
+      Excon.stubs.pop
+      {status: 400, body: 'Bad inputs provided.'}
+    end
+    assert_raises Excon::Errors::BadRequest do
+      @client.store(@receipt)
+    end
+  end
 end

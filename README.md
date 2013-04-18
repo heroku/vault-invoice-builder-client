@@ -33,6 +33,14 @@ client = Vault::InvoiceBuilder::Client.new(
   'https://vault-invoice-builder.herokuapp.com')
 ```
 
+For endpoints that require authentication, HTTP Basic credentials must
+be supplied in the URL:
+
+```ruby
+client = Vault::InvoiceBuilder::Client.new(
+  'https://username:password@vault-invoice-builder.herokuapp.com')
+```
+
 ### Rendering an invoice.
 
 An invoice contains customer contact and tax details, a list of apps
@@ -46,4 +54,14 @@ and credits.
 ```ruby
 receipt = {user: 'user123@heroku.com', start_time: …, …}
 html_content = client.render_html(receipt)
+```
+
+### Storing an invoice
+The `store` method can be used to render an invoice and then store it
+to S3.  The same receipt JSON object is passed and an empty 200 OK
+response is returned if the request was successful.
+
+```ruby
+receipt = {user: 'user123@heroku.com', start_time: …, …}
+response = client.store(receipt)
 ```

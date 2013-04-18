@@ -1,4 +1,5 @@
 .bundle/
+.rvmrc
 .yardoc/
 doc/
 vendor/

@@ -30,5 +30,21 @@ module Vault::InvoiceBuilder
         expects: [200])
       response.body
     end
+
+    # Render a receipt into an HTML invoice and store it to S3.
+    #
+    # @param receipt [Hash] An object matching the receipt format described in
+    #   the `Vault::InvoiceBuilder` README.
+    # @raise [Excon::Errors::HTTPStatusError] Raised if the server returns an
+    #   unsuccessful HTTP status code.
+    # @return [Excon::Response] The response object.
+    def store(receipt)
+      connection = Excon.new(@url)
+      response = connection.post(
+        path: '/store',
+        headers: {'Content-Type' => 'application/json'},
+        body: JSON.generate(receipt),
+        expects: [200])
+    end
   end
 end
