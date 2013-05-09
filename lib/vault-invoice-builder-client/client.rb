@@ -14,36 +14,53 @@ module Vault::InvoiceBuilder
       @url = url || ENV['VAULT_INVOICE_BUILDER_URL']
     end
 
-    # Render a receipt into an HTML invoice.
+    # Render a statement into an HTML invoice.
     #
-    # @param receipt [Hash] An object matching the receipt format described in
+    # @param statement [Hash] An object matching the statement format described in
     #   the `Vault::InvoiceBuilder` README.
     # @raise [Excon::Errors::HTTPStatusError] Raised if the server returns an
     #   unsuccessful HTTP status code.
     # @return [String] The rendered HTML invoice.
-    def render_html(receipt)
+    def render_html(statement)
       connection = Excon.new(@url)
       response = connection.post(
         path: "/invoice.html",
         headers: {'Content-Type' => 'application/json'},
-        body: JSON.generate(receipt),
+        body: JSON.generate(statement),
         expects: [200])
       response.body
     end
 
-    # Render a receipt into an HTML invoice and store it to S3.
+    # POST a statement to to the proxy-able /statement/:id endpoint
     #
-    # @param receipt [Hash] An object matching the receipt format described in
+    # @param statement [Hash] An object matching the statement format described in
     #   the `Vault::InvoiceBuilder` README.
     # @raise [Excon::Errors::HTTPStatusError] Raised if the server returns an
     #   unsuccessful HTTP status code.
     # @return [Excon::Response] The response object.
-    def store(receipt)
+    def post(statement)
+      connection = Excon.new(@url)
+      id = statement[:id] || statement['id']
+      response = connection.post(
+        path: "/statement/#{id}",
+        headers: {'Content-Type' => 'application/json'},
+        body: JSON.generate(statement),
+        expects: [200])
+    end
+
+    # @deprecated
+    #
+    # @param statement [Hash] An object matching the statement format described in
+    #   the `Vault::InvoiceBuilder` README.
+    # @raise [Excon::Errors::HTTPStatusError] Raised if the server returns an
+    #   unsuccessful HTTP status code.
+    # @return [Excon::Response] The response object.
+    def store(statement)
       connection = Excon.new(@url)
       response = connection.post(
         path: '/store',
         headers: {'Content-Type' => 'application/json'},
-        body: JSON.generate(receipt),
+        body: JSON.generate(statement),
         expects: [200])
     end
   end

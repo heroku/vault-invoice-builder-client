@@ -9,7 +9,7 @@ class ClientTest < Vault::TestCase
     Excon.defaults[:mock] = true
     @client = Vault::InvoiceBuilder::Client.new(
       'https://vault-invoice-builder.herokuapp.com')
-    @receipt = {user: 'user123@heroku.com',
+    @statement = {user: 'user123@heroku.com',
                 start_time: Time.utc(2012, 1),
                 stop_time: Time.utc(2012, 2)}
   end
@@ -45,7 +45,7 @@ class ClientTest < Vault::TestCase
       Excon.stubs.pop
       {status: 200, body: content}
     end
-    assert_equal(content, @client.render_html(@receipt))
+    assert_equal(content, @client.render_html(@statement))
   end
 
   # Client.render_html raises the appropriate Excon::Errors::HTTPStatusError
@@ -56,7 +56,7 @@ class ClientTest < Vault::TestCase
       {status: 400, body: 'Bad inputs provided.'}
     end
     assert_raises Excon::Errors::BadRequest do
-      @client.render_html(@receipt)
+      @client.render_html(@statement)
     end
   end
 
@@ -72,7 +72,7 @@ class ClientTest < Vault::TestCase
       Excon.stubs.pop
       {status: 200}
     end
-    response = @client.store(@receipt)
+    response = @client.store(@statement)
     assert_equal(200, response.status)
   end
 
@@ -84,7 +84,49 @@ class ClientTest < Vault::TestCase
       {status: 400, body: 'Bad inputs provided.'}
     end
     assert_raises Excon::Errors::BadRequest do
-      @client.store(@receipt)
+      @client.store(@statement)
+    end
+  end
+
+  # Client.post makes a POST request to the canonical statement drain API
+  def test_post_with_symbol_id_key
+    @statement[:id] = 1
+    Excon.stub(method: :post) do |request|
+      assert_equal('vault-invoice-builder.herokuapp.com:443',
+                   request[:host_port])
+      assert_equal('/statement/1', request[:path])
+      assert_equal('application/json', request[:headers]['Content-Type'])
+      Excon.stubs.pop
+      {status: 200}
+    end
+    response = @client.post(@statement)
+    assert_equal(200, response.status)
+  end
+
+  # Client.post makes a POST request to the canonical statement drain API
+  def test_post_with_string_id_key
+    @statement['id'] = 1
+    Excon.stub(method: :post) do |request|
+      assert_equal('vault-invoice-builder.herokuapp.com:443',
+                   request[:host_port])
+      assert_equal('/statement/1', request[:path])
+      assert_equal('application/json', request[:headers]['Content-Type'])
+      Excon.stubs.pop
+      {status: 200}
+    end
+    response = @client.post(@statement)
+    assert_equal(200, response.status)
+  end
+
+  # Client.store raises the appropriate Excon::Errors::HTTPStatusError if an
+  # unsuccessful HTTP status code is returned by the server.
+  def test_post_with_unsuccessful_response
+    Excon.stub(method: :post) do |request|
+      Excon.stubs.pop
+      {status: 400, body: 'Bad inputs provided.'}
+    end
+    assert_raises Excon::Errors::BadRequest do
+      @client.post(@statement)
     end
   end
 end

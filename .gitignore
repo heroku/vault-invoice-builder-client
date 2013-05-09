@@ -3,3 +3,4 @@
 .yardoc/
 doc/
 vendor/
+test/.test*
