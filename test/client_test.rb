@@ -1,4 +1,5 @@
 require 'helper'
+require 'multi_json'
 
 class ClientTest < Vault::TestCase
   include Vault::Test::EnvironmentHelpers
@@ -39,8 +40,8 @@ class ClientTest < Vault::TestCase
   def test_render_html
     content = '<html><body><p>Hello, world!</p></body></html>'
     Excon.stub(method: :post) do |request|
-      assert_equal('vault-invoice-builder.herokuapp.com:443',
-                   request[:host_port])
+      assert_equal('vault-invoice-builder.herokuapp.com', request[:host])
+      assert_equal(443, request[:port])
       assert_equal("/invoice.html", request[:path])
       Excon.stubs.pop
       {status: 200, body: content}
@@ -65,8 +66,8 @@ class ClientTest < Vault::TestCase
   # Vault::InvoiceBuilder to generate the invoice and store it to S3.
   def test_store
     Excon.stub(method: :post) do |request|
-      assert_equal('vault-invoice-builder.herokuapp.com:443',
-                   request[:host_port])
+      assert_equal('vault-invoice-builder.herokuapp.com', request[:host])
+      assert_equal(443, request[:port])
       assert_equal('/store', request[:path])
       assert_equal('application/json', request[:headers]['Content-Type'])
       Excon.stubs.pop
@@ -92,8 +93,8 @@ class ClientTest < Vault::TestCase
   def test_post_with_symbol_id_key
     @statement[:id] = 1
     Excon.stub(method: :post) do |request|
-      assert_equal('vault-invoice-builder.herokuapp.com:443',
-                   request[:host_port])
+      assert_equal('vault-invoice-builder.herokuapp.com', request[:host])
+      assert_equal(443, request[:port])
       assert_equal('/statement/1', request[:path])
       assert_equal('application/json', request[:headers]['Content-Type'])
       Excon.stubs.pop
@@ -107,8 +108,8 @@ class ClientTest < Vault::TestCase
   def test_post_with_string_id_key
     @statement['id'] = 1
     Excon.stub(method: :post) do |request|
-      assert_equal('vault-invoice-builder.herokuapp.com:443',
-                   request[:host_port])
+      assert_equal('vault-invoice-builder.herokuapp.com', request[:host])
+      assert_equal(443, request[:port])
       assert_equal('/statement/1', request[:path])
       assert_equal('application/json', request[:headers]['Content-Type'])
       Excon.stubs.pop
@@ -129,4 +130,21 @@ class ClientTest < Vault::TestCase
       @client.post(@statement)
     end
   end
+
+  # Client.post_url makes a POST request to the canonical statement drain API
+  def test_post_url_with_url
+    json = { url: 'http://encrypted.url.example' }
+    Excon.stub(method: :post) do |request|
+      assert_equal('vault-invoice-builder.herokuapp.com', request[:host])
+      assert_equal(443, request[:port])
+      assert_equal('/statements', request[:path])
+      assert_equal('application/json', request[:headers]['Content-Type'])
+      assert_equal(json, MultiJson.load(request[:body], {symbolize_keys: true}))
+      Excon.stubs.pop
+      {status: 202}
+    end
+    response = @client.post_url('http://encrypted.url.example')
+    assert_equal(202, response.status)
+  end
+
 end

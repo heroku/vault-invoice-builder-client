@@ -18,4 +18,5 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'excon'
   gem.add_dependency 'yajl-ruby'
+  gem.add_dependency 'multi_json'
 end

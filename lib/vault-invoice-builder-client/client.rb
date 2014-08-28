@@ -31,6 +31,24 @@ module Vault::InvoiceBuilder
       response.body
     end
 
+    # POST an encrypted statement URL to to the proxy-able /statement/:id
+    # endpoint
+    #
+    # @param statement_url [String] An encrypted URL to an object matching the
+    #   statement format described in the `Vault::InvoiceBuilder` README.
+    # @raise [Excon::Errors::HTTPStatusError] Raised if the server returns an
+    #   unsuccessful HTTP status code.
+    # @return [Excon::Response] The response object.
+    def post_url(statement_url)
+      connection = Excon.new(@url)
+      response = connection.post(
+        path: "/statements",
+        headers: {'Content-Type' => 'application/json'},
+        body: JSON.generate(url: statement_url),
+        expects: [202])
+    end
+
+    # @deprecated Please use {#post_url} instead
     # POST a statement to to the proxy-able /statement/:id endpoint
     #
     # @param statement [Hash] An object matching the statement format described in
