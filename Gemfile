@@ -11,5 +11,5 @@ end
 
 group :test do
   gem 'rr'
-  gem 'vault-test-tools', path: '~/src/vault-test-tools'
+  gem 'vault-test-tools'
 end
