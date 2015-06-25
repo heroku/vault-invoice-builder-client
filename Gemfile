@@ -5,7 +5,7 @@ gemspec
 group :development do
   gem 'rake'
   gem 'yard'
-  gem 'debugger'
+  gem 'byebug'
   gem 'multi_json'
 end
 
