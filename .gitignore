@@ -5,3 +5,4 @@ doc/
 vendor/
 test/.test*
 pkg/
+*.swp
