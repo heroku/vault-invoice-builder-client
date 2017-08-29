@@ -133,7 +133,7 @@ class ClientTest < Vault::TestCase
 
   # Client.post_url makes a POST request to the canonical statement drain API
   def test_post_url_with_url
-    json = { url: 'http://encrypted.url.example' }
+    json = { url: 'http://encrypted.url.example', json_size: 100 }
     Excon.stub(method: :post) do |request|
       assert_equal('vault-invoice-builder.herokuapp.com', request[:host])
       assert_equal(443, request[:port])
@@ -143,7 +143,7 @@ class ClientTest < Vault::TestCase
       Excon.stubs.pop
       {status: 202}
     end
-    response = @client.post_url('http://encrypted.url.example')
+    response = @client.post_url('http://encrypted.url.example', 100)
     assert_equal(202, response.status)
   end
 
