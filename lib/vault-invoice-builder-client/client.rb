@@ -36,15 +36,16 @@ module Vault::InvoiceBuilder
     #
     # @param statement_url [String] An encrypted URL to an object matching the
     #   statement format described in the `Vault::InvoiceBuilder` README.
+    # @param json_size [Integer] The size of the json statement in bytes
     # @raise [Excon::Errors::HTTPStatusError] Raised if the server returns an
     #   unsuccessful HTTP status code.
     # @return [Excon::Response] The response object.
-    def post_url(statement_url)
+    def post_url(statement_url, json_size=nil)
       connection = Excon.new(@url)
       response = connection.post(
         path: "/statements",
         headers: {'Content-Type' => 'application/json'},
-        body: JSON.generate(url: statement_url),
+        body: JSON.generate(url: statement_url, json_size: json_size),
         expects: [202])
     end
 
