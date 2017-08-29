@@ -1,5 +1,6 @@
 require 'helper'
 require 'multi_json'
+require 'pry'
 
 class ClientTest < Vault::TestCase
   include Vault::Test::EnvironmentHelpers
@@ -141,10 +142,13 @@ class ClientTest < Vault::TestCase
       assert_equal('application/json', request[:headers]['Content-Type'])
       assert_equal(json, MultiJson.load(request[:body], {symbolize_keys: true}))
       Excon.stubs.pop
-      {status: 202}
+      {status: 202, body: JSON.generate(url: 'http://encrypted.url.example', json_size: 100)}
     end
     response = @client.post_url('http://encrypted.url.example', 100)
+    doc = MultiJson.load(response.body, symbolize_keys: true)
     assert_equal(202, response.status)
+    assert_equal('http://encrypted.url.example', doc[:url])
+    assert_equal(100, doc[:json_size])
   end
 
 end
