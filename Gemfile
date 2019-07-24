@@ -3,14 +3,14 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'rake'
-  gem 'yard'
   gem 'byebug'
   gem 'multi_json'
+  gem 'rake'
+  gem 'yard'
 end
 
 group :test do
+  gem 'pry'
   gem 'rr'
   gem 'vault-test-tools'
-  gem 'pry'
 end
