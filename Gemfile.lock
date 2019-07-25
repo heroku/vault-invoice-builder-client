@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vault-invoice-builder-client (0.0.5)
+    vault-invoice-builder-client (0.0.7)
       excon
       multi_json
       yajl-ruby
