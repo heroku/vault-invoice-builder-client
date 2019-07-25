@@ -40,13 +40,15 @@ module Vault::InvoiceBuilder
     # @raise [Excon::Errors::HTTPStatusError] Raised if the server returns an
     #   unsuccessful HTTP status code.
     # @return [Excon::Response] The response object.
-    def post_url(statement_url, json_size=nil)
+    def post_url(statement_url, json_size=nil, options={})
       connection = Excon.new(@url)
-      response = connection.post(
+      params =  { url: statement_url, json_size: json_size }.merge(options)
+      connection.post(
         path: "/statements",
         headers: {'Content-Type' => 'application/json'},
-        body: JSON.generate(url: statement_url, json_size: json_size),
-        expects: [202])
+        body: JSON.generate(params),
+        expects: [202]
+      )
     end
 
     # @deprecated Please use {#post_url} instead

@@ -151,4 +151,22 @@ class ClientTest < Vault::TestCase
     assert_equal(100, doc[:json_size])
   end
 
+  def test_post_url_with_options
+    json = { url: 'http://encrypted.url.example', json_size: 100, run_rate_statement: 'true' }
+    Excon.stub(method: :post) do |request|
+      assert_equal('vault-invoice-builder.herokuapp.com', request[:host])
+      assert_equal(443, request[:port])
+      assert_equal('/statements', request[:path])
+      assert_equal('application/json', request[:headers]['Content-Type'])
+      assert_equal(json, MultiJson.load(request[:body], {symbolize_keys: true}))
+      Excon.stubs.pop
+      {status: 202, body: JSON.generate(url: 'http://encrypted.url.example', json_size: 100, run_rate_statement: 'true')}
+    end
+    response = @client.post_url('http://encrypted.url.example', 100, run_rate_statement: 'true')
+    doc = MultiJson.load(response.body, symbolize_keys: true)
+    assert_equal(202, response.status)
+    assert_equal('http://encrypted.url.example', doc[:url])
+    assert_equal(100, doc[:json_size])
+    assert_equal('true', doc[:run_rate_statement])
+  end
 end
