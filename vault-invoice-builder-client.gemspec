@@ -5,9 +5,11 @@ require 'vault-invoice-builder-client/version'
 Gem::Specification.new do |gem|
   gem.name          = "vault-invoice-builder-client"
   gem.version       = Vault::InvoiceBuilder::Client::VERSION
-  gem.authors       = ["Chris Continanza", "Jamu Kakar", "Matthew Manning"]
+  gem.authors       = ["Chris Continanza", "Jamu Kakar", "Matthew Manning",
+                       "Nick Yoo", "Jessie Young"]
   gem.email         = ["csquared@heroku.com", "jkakar@heroku.com",
-                       "matthew@heroku.com"]
+                       "matthew@heroku.com", "nickhyoo@gmail.com",
+                       "jessie.a.young@gmail.com"]
   gem.description   = "Client for Vault::InvoiceBuilder"
   gem.summary       = "A simple wrapper for the Vault::InvoiceBuilder HTTP API"
   gem.homepage      = "https://github.com/heroku/vault-invoice-builder-client"
