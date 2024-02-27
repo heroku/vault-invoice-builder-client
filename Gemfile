@@ -12,5 +12,5 @@ end
 group :test do
   gem 'pry'
   gem 'rr'
-  gem 'vault-test-tools'
+  gem 'vault-test-tools', '>= 1.1.0'
 end
