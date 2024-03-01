@@ -6,7 +6,7 @@ group :development do
   gem 'byebug'
   gem 'multi_json'
   gem 'rake'
-  gem 'yard'
+  gem 'yard', '>= 0.9.35'
 end
 
 group :test do
